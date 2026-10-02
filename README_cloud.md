@@ -124,6 +124,21 @@ port from your laptop and open <http://localhost:60030>:
 ssh -L 60030:localhost:60030 <user>@<host> -p <ssh-port>
 ```
 
+## Change ports
+
+The services use three consecutive ports from `VIBESIM_PORT_BASE` (1024–65533):
+UI = base, Agent = base + 1, Analyzer = base + 2. Only the UI port needs to be
+reachable from outside. Example for UI on `8080`:
+
+```bash
+echo 'export VIBESIM_PORT_BASE=8080' >> .env
+just stop
+just check-ports    # all three must be free; Jupyter often holds 8888
+just start
+```
+
+Then forward the new UI port instead: `ssh -L 8080:localhost:8080 ...`.
+
 ## Daily commands
 
 | Command | Purpose |
@@ -142,4 +157,4 @@ ssh -L 60030:localhost:60030 <user>@<host> -p <ssh-port>
 | `Provider configuration file is required` | Do step 4 before step 5. |
 | `error mounting "..." to rootfs` | The workspace is on a filesystem Docker cannot mount; redo step 1 and clone elsewhere. |
 | UI shows `Agent unavailable`; `tmp/backend.log` has `HF_HOME directory must exist` | `mkdir -p "$HF_HOME"` and retry; no restart needed. |
-| `Port check failed` | Set `VIBESIM_PORT_BASE=<free port>` in `.env`. |
+| `Port check failed` | Pick another base; see [Change ports](#change-ports). |
